@@ -6,16 +6,13 @@
  * Description: Internal logging implementation
  */
 
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
 #include <stdint.h>
-#include <unistd.h>
+#include <stdio.h>
 #include <sys/socket.h>
-#include <sys/poll.h>
+#include <unistd.h>
 
-#include "private.h"
 #include "libkalert/libkalert.h"
+#include "private.h"
 
 /* Single thread only */
 static uint32_t next_seq(void)
@@ -186,7 +183,7 @@ static int check_ack(int fd, int seq)
 			/* consume */
 			(void)kalert_get_reply(fd, &rep, GET_REPLY_NONBLOCKING,
 					       0);
-			return error ? -error : 0;
+			return error;
 		}
 
 		/* consume and ignore other messages */
@@ -211,6 +208,9 @@ static int kalert_send(int fd, struct kalert_message *req, int *seq)
 				(struct sockaddr *)&addr, sizeof(addr));
 	} while (retval < 0 && errno == EINTR);
 
+	if (retval < 0)
+		return -errno;
+
 	return retval;
 }
 
@@ -226,7 +226,6 @@ static int kalert_send(int fd, struct kalert_message *req, int *seq)
  * Return:
  *   =0   : request acknowledged successfully
  *   <0   : error occurred (errno will be set accordingly)
- *   >0   : bytes send (number of bytes written)
  */
 int kalert_send_request(int fd, struct kalert_message *req)
 {
@@ -236,8 +235,12 @@ int kalert_send_request(int fd, struct kalert_message *req)
 	if (fd < 0 || !req)
 		return -EINVAL;
 
+	if (fd < 0 || !req)
+		return -EINVAL;
+
 	rc = kalert_send(fd, req, &seq);
-	if (rc == (int)req->nlh.nlmsg_len)
+	if (rc == (int)req->nlh.nlmsg_len) {
 		return check_ack(fd, seq);
+	}
 	return rc;
 }

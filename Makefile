@@ -30,9 +30,10 @@ clean:
 install: all
 	@echo "Installing library files..."
 	mkdir -p $(DESTDIR)$(PREFIX)/lib $(DESTDIR)$(PREFIX)/include/$(LIB_NAME)
-	cp $(LIB_BUILD)/*.so* $(DESTDIR)$(PREFIX)/lib/ || true
-	cp $(LIB_BUILD)/*.a   $(DESTDIR)$(PREFIX)/lib/ || true
+	cp -a $(LIB_BUILD)/*.so* $(DESTDIR)$(PREFIX)/lib/ || true
+	cp -a $(LIB_BUILD)/*.a   $(DESTDIR)$(PREFIX)/lib/ || true
 	cp -a $(SRC_ROOT)/include/$(LIB_NAME)/* $(DESTDIR)$(PREFIX)/include/$(LIB_NAME)/
+	ldconfig
 
 	@echo "Installing binaries..."
 	mkdir -p $(DESTDIR)$(PREFIX)/bin

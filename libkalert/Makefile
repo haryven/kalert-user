@@ -11,7 +11,7 @@ SRC          := $(wildcard *.c)
 OBJ          := $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC))
 
 CFLAGS       := -Wall -Wextra -O2 -fPIC -I$(SRC_ROOT)/include
-LDFLAGS      := -shared -Wl,-soname,$(LIB_SONAME)
+LDFLAGS      := -shared -Wl,-soname,$(LIB_SONAME) -lmnl
 
 .PHONY: all clean
 
