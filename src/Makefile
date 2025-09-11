@@ -2,7 +2,7 @@ SRCS     := $(wildcard *.c)
 BINS     := $(patsubst %.c,$(BUILD_DIR)/%,$(SRCS))
 
 CFLAGS   := -I$(SRC_ROOT)/include -Wall -O2
-LDFLAGS  := -L$(LIB_BUILD) -lkalert -lmnl
+LDFLAGS  := -L$(LIB_BUILD) -lkalert
 
 .PHONY: all clean
 

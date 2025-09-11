@@ -22,7 +22,7 @@ int kalert_request_status(int fd, uint64_t mask)
 	struct kalert_message req;
 
 	memset(&req, 0, sizeof(req));
-	req.nlh.nlmsg_len = NLMSG_SPACE(0);
+	req.nlh.nlmsg_len = NLMSG_LENGTH(0);
 	req.nlh.nlmsg_type = KALERT_CMD_GET_STATUS;
 
 	mnl_attr_put_u64(&req.nlh, KALERT_GET_STAT_MASK, mask);
@@ -66,7 +66,7 @@ int kalert_set_parameter(int fd, uint32_t attr_mask, uint64_t *attr)
 	}
 
 	memset(&req, 0, sizeof(req));
-	req.nlh.nlmsg_len = NLMSG_SPACE(0);
+	req.nlh.nlmsg_len = NLMSG_LENGTH(0);
 	req.nlh.nlmsg_type = KALERT_CMD_SET_CHNL;
 
 	for (i = 1; i < KALERT_ATTR_MAX; i++) {
@@ -164,4 +164,60 @@ int kalert_start_channel(void)
 		return rc;
 	}
 	return sock_fd;
+}
+
+int kalert_subscribe_type(int fd, uint64_t type_mask, uint32_t level)
+{
+	struct kalert_message req;
+	int rc;
+
+	if (!TYPE_MASK_VALID(type_mask) || level >= KALERT_LEVEL_MAX)
+		return -EINVAL;
+
+	memset(&req, 0, sizeof(req));
+	req.nlh.nlmsg_len = NLMSG_LENGTH(0);
+	req.nlh.nlmsg_type = KALERT_CMD_SUBSCRIBE;
+
+	mnl_attr_put_u64(&req.nlh, KALERT_SUB_TYPE_MASK, type_mask);
+	mnl_attr_put_u32(&req.nlh, KALERT_SUB_LEVEL, level);
+
+	rc = kalert_send_request(fd, &req);
+	if (rc < 0) {
+		kalert_msg(LOG_WARNING, "Error sending subscribe request (%s)",
+			   strerror(-rc));
+	}
+
+	return rc;
+}
+
+int __kalert_subscribe_event(int fd, const int *event_ids, size_t count,
+			     uint32_t level)
+{
+	struct kalert_message req;
+	unsigned long event_mask[BITS_TO_LONGS(KALERT_EVENT_MAX)];
+	int rc;
+
+	if (!event_ids || count == 0)
+		return -EINVAL;
+
+	rc = events_to_bitmap(event_ids, count, event_mask, KALERT_EVENT_MAX);
+	if (rc < 0)
+		return rc;
+
+	memset(&req, 0, sizeof(req));
+	req.nlh.nlmsg_len = NLMSG_LENGTH(0);
+	req.nlh.nlmsg_type = KALERT_CMD_SUBSCRIBE;
+
+	mnl_attr_put_u32(&req.nlh, KALERT_SUB_LEVEL, level);
+	mnl_attr_put(&req.nlh, KALERT_SUB_EVENT_MASK, sizeof(event_mask),
+		     event_mask);
+
+	rc = kalert_send_request(fd, &req);
+	if (rc < 0) {
+		kalert_msg(LOG_WARNING,
+			   "Error sending event subscribe request (%d: %s)",
+			   -rc, strerror(-rc));
+	}
+
+	return rc;
 }
