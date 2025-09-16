@@ -19,7 +19,7 @@ all: lib app
 lib:
 	$(MAKE) -C $(LIB_SRC) BUILD_DIR=$(LIB_BUILD)
 
-app:
+app: lib
 	$(MAKE) -C $(APP_SRC) BUILD_DIR=$(APP_BUILD)
 
 clean:
@@ -33,7 +33,6 @@ install: all
 	cp -a $(LIB_BUILD)/*.so* $(DESTDIR)$(PREFIX)/lib/ || true
 	cp -a $(LIB_BUILD)/*.a   $(DESTDIR)$(PREFIX)/lib/ || true
 	cp -a $(SRC_ROOT)/include/$(LIB_NAME)/* $(DESTDIR)$(PREFIX)/include/$(LIB_NAME)/
-	ldconfig
 
 	@echo "Installing binaries..."
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
