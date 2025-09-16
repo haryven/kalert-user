@@ -5,8 +5,11 @@ BUILD_DIR   := $(SRC_ROOT)/build
 LIB_BUILD   := $(BUILD_DIR)/libkalert
 APP_BUILD   := $(BUILD_DIR)/app
 
-PREFIX      ?= /usr
-DESTDIR     ?=
+DESTDIR		?=
+PREFIX		?= /usr/local
+libdir		?= $(PREFIX)/lib
+bindir		?= $(PREFIX)/bin
+
 
 LIB_NAME    := libkalert
 
@@ -29,25 +32,24 @@ clean:
 
 install: all
 	@echo "Installing library files..."
-	mkdir -p $(DESTDIR)$(PREFIX)/lib $(DESTDIR)$(PREFIX)/include/$(LIB_NAME)
-	cp -a $(LIB_BUILD)/*.so* $(DESTDIR)$(PREFIX)/lib/ || true
-	cp -a $(LIB_BUILD)/*.a   $(DESTDIR)$(PREFIX)/lib/ || true
+	mkdir -p $(DESTDIR)$(libdir)/ $(DESTDIR)$(PREFIX)/include/$(LIB_NAME)
+	cp -a $(LIB_BUILD)/*.so* $(DESTDIR)$(libdir) || true
+	cp -a $(LIB_BUILD)/*.a   $(DESTDIR)$(libdir) || true
 	cp -a $(SRC_ROOT)/include/$(LIB_NAME)/* $(DESTDIR)$(PREFIX)/include/$(LIB_NAME)/
 
 	@echo "Installing binaries..."
-	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp -a $(APP_BUILD)/* $(DESTDIR)$(PREFIX)/bin/
+	mkdir -p $(DESTDIR)$(bindir)
+	cp -a $(APP_BUILD)/* $(DESTDIR)$(bindir)
 
 uninstall:
 	@echo "Removing installed files..."
-	# remove head file
+	# remove libs
 	for f in $(notdir $(wildcard $(LIB_BUILD)/*)); do \
-	    rm -f $(DESTDIR)$(PREFIX)/lib/$$f; \
+	    rm -f $(DESTDIR)$(libdir)/$$f; \
 	done
-	# remove lib
+	# remove headers
 	rm -rf $(DESTDIR)$(PREFIX)/include/$(LIB_NAME)
-	# remove app
+	# remove apps
 	for f in $(notdir $(wildcard $(APP_BUILD)/*)); do \
-	    rm -f $(DESTDIR)$(PREFIX)/bin/$$f; \
+	    rm -f $(DESTDIR)$(bindir)/$$f; \
 	done
-
