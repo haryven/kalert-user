@@ -16,9 +16,9 @@ BuildRequires:  libmnl-devel
 Provides:       libkalert.so
 
 %description
-kalert-user 提供 Kalert 内核特性的用户态支持，包括：
-- libkalert 用户空间库，用于开发集成 kalert 功能的应用。
-- kalertd 后台程序，负责监听和处理 kalert 内核事件。
+kalert-user provides user space support for Kalert kernel features:
+- libkalert library for application integration
+- kalertd daemon to monitor and handle kernel events
 
 %prep
 %autosetup -n %{name}-%{version}
@@ -35,8 +35,20 @@ sed -e "s|@prefix@|%{_prefix}|" \
     -e "s|@libdir@|%{_libdir}|" \
     packaging/libkalert.pc.in > %{buildroot}%{_libdir}/pkgconfig/libkalert.pc
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+# install systemd unit
+mkdir -p %{buildroot}%{_unitdir}
+install -m 0644 packaging/kalertd.service %{buildroot}%{_unitdir}/kalertd.service
+
+%post
+/sbin/ldconfig
+%systemd_post kalertd.service
+
+%preun
+%systemd_preun kalertd.service
+
+%postun
+/sbin/ldconfig
+%systemd_postun_with_restart kalertd.service
 
 %files
 %license COPYING
@@ -48,6 +60,7 @@ sed -e "s|@prefix@|%{_prefix}|" \
 %{_libdir}/libkalert.a
 %{_includedir}/libkalert/
 %{_libdir}/pkgconfig/libkalert.pc
+%{_unitdir}/kalertd.service
 
 %changelog
 * Mon Aug 18 2025 Huiwen He <hehuiwen@kylinos.cn> - 1.0.0-1

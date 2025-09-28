@@ -1,0 +1,15 @@
+[Unit]
+Description=Kernel Alert Daemon (kalertd)
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/kalertd
+Restart=on-failure
+RestartSec=60
+StartLimitBurst=3
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
