@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <libkalert/libkalert.h>
+#include <ev.h>
 
 static int sock_fd;
 static int msg_count;
@@ -31,11 +32,31 @@ void parse_notify_message(struct kalert_message *reply)
 	}
 }
 
-int main()
+static void netlink_handler(struct ev_loop *loop, struct ev_io *w, int revents)
 {
-	int rc;
 	struct kalert_message reply;
 
+	while (kalert_get_reply(sock_fd, &reply, GET_REPLY_NONBLOCKING, 0) > 0)
+		parse_notify_message(&reply);
+}
+
+static void start_event_loop()
+{
+	struct ev_loop *loop = EV_DEFAULT;
+	struct ev_io netlink_watcher;
+
+	/* Register netlink event watcher */
+	ev_io_init(&netlink_watcher, netlink_handler, sock_fd, EV_READ);
+	ev_io_start(loop, &netlink_watcher);
+
+	/* Starting event loop */
+	ev_run(loop, 0);
+
+	ev_io_stop(loop, &netlink_watcher);
+}
+
+int main()
+{
 	printf("Kernel Fault Events Alert daemon starting...\n");
 	kalert_msg(LOG_INFO, "Kalert daemon starting...");
 
@@ -47,10 +68,9 @@ int main()
 		return -1;
 	}
 
-	while (1) {
-		rc = kalert_get_reply(sock_fd, &reply, GET_REPLY_BLOCKING, 0);
-		if (rc > 0)
-			parse_notify_message(&reply);
-	}
+	start_event_loop();
+
+	kalert_close(sock_fd);
+
 	return 0;
 }
