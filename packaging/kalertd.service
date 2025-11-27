@@ -4,6 +4,7 @@ Description=Kernel Alert Daemon (kalertd)
 [Service]
 Type=simple
 ExecStart=/usr/bin/kalertd
+ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=60
 StartLimitBurst=3
