@@ -10,6 +10,8 @@
 #include <libkalert/libkalert.h>
 #include <ev.h>
 
+#include "common/kalert_event.h"
+
 static int sock_fd;
 static int msg_count;
 
@@ -17,6 +19,7 @@ static struct ev_loop *loop;
 static struct ev_io netlink_watcher;
 static struct ev_signal sigterm_watcher;
 static struct ev_signal sighup_watcher;
+#define KALERT_EVENT_LOG_FILE "/var/log/kalert_event.log"
 
 void parse_notify_message(struct kalert_message *reply)
 {
@@ -90,10 +93,14 @@ int main()
 	sock_fd = kalert_start_channel();
 	if (sock_fd < 0) {
 		printf("Failed to initialize alert subsystem, exiting...\n");
-		kalert_msg(LOG_INFO,
+		kalert_msg(LOG_ERR,
 			   "Kalert daemon starting failed, exiting...");
 		return -1;
 	}
+
+	if (kalert_event_log_init(KALERT_EVENT_LOG_FILE))
+		kalert_msg(LOG_WARNING,
+			   "Failed to open kalert events log file");
 
 	start_event_loop();
 
