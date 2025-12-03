@@ -12,10 +12,13 @@ bindir		?= $(PREFIX)/bin
 
 
 LIB_NAME    := libkalert
+VERSION := 1.0.0
+PACKAGE := kalert-user-$(VERSION)
+DIST_FILES := $(shell git ls-files)
 
 export SRC_ROOT BUILD_DIR LIB_BUILD APP_BUILD PREFIX DESTDIR LIB_NAME
 
-.PHONY: all lib app clean install uninstall
+.PHONY: all lib app clean install uninstall dist
 
 all: lib app
 
@@ -53,3 +56,10 @@ uninstall:
 	for f in $(notdir $(wildcard $(APP_BUILD)/*)); do \
 	    rm -f $(DESTDIR)$(bindir)/$$f; \
 	done
+
+dist:
+	@echo "Creating $(PACKAGE).tar.gz ..."
+	tar -czf $(PACKAGE).tar.gz \
+		--transform 's,^,$(PACKAGE)/,' \
+		$(DIST_FILES)
+	@echo "Done."
