@@ -11,6 +11,7 @@
 #include <ev.h>
 
 #include "common/kalert_event.h"
+#include "common/common.h"
 
 static int sock_fd;
 static int msg_count;
@@ -19,7 +20,35 @@ static struct ev_loop *loop;
 static struct ev_io netlink_watcher;
 static struct ev_signal sigterm_watcher;
 static struct ev_signal sighup_watcher;
+
+/* Global variables */
+bool g_flag_utc = false;
+
 #define KALERT_EVENT_LOG_FILE "/var/log/kalert_event.log"
+#define KALERTD_CONF_FILE "/etc/kalert/kalertd.conf"
+
+bool parse_main_conf_line(const char *key, const char *val)
+{
+	if (strcmp(key, "UTC_TIME") == 0) {
+		g_flag_utc = (strcasecmp(val, "on") == 0);
+		return true;
+	}
+	return false;
+}
+
+/* Load kalertd configuration safely into global g_cfg */
+bool load_kalertd_config(void)
+{
+	if (!parse_config(KALERTD_CONF_FILE, parse_main_conf_line)) {
+		kalert_msg(LOG_ERR,
+			   "Failed to parse config, using previous values\n");
+		return false;
+	}
+
+	kalert_event_set_utc(g_flag_utc);
+
+	return true;
+}
 
 void parse_notify_message(struct kalert_message *reply)
 {
@@ -53,6 +82,8 @@ static void netlink_handler(struct ev_loop *loop, struct ev_io *w, int revents)
 static void hup_handler(struct ev_loop *loop, struct ev_signal *w, int revents)
 {
 	kalert_msg(LOG_INFO, "Received SIGHUP, reloading configuration...");
+	if (!load_kalertd_config())
+		kalert_msg(LOG_WARNING, "Reload configuration failed \n");
 }
 
 /* ---------------------- Termination Handler ------------------- */
@@ -97,6 +128,9 @@ int main()
 			   "Kalert daemon starting failed, exiting...");
 		return -1;
 	}
+
+	if (!load_kalertd_config())
+		return -1;
 
 	if (kalert_event_log_init(KALERT_EVENT_LOG_FILE))
 		kalert_msg(LOG_WARNING,
