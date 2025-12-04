@@ -78,27 +78,27 @@ static const char* const kalert_type_to_str[] = {
 
 static const char* const kalert_level_to_str[] = {
 	[KALERT_LEVEL_ALL] = "unknow",
-	[KALERT_NOTICE] = "generic",
+	[KALERT_INFO] = "info",
 	[KALERT_WARN] = "warn",
 	[KALERT_ERROR] = "error",
 	[KALERT_FATAL] = "fatal"
 };
 
 static const char * const kalert_event_str[] = {
-	[KALERT_GEN_SOFTLOCKUP - KALERT_NOTIFY_BASE] = "softlockup",
-	[KALERT_GEN_RCUSTALL   - KALERT_NOTIFY_BASE] = "rcu stall",
-	[KALERT_GEN_HUNGTASK   - KALERT_NOTIFY_BASE] = "hung task",
-	[KALERT_MEM_ALLOCFAIL  - KALERT_NOTIFY_BASE] = "mem alloc fail",
-	[KALERT_MEM_OOM        - KALERT_NOTIFY_BASE] = "oom",
-	[KALERT_MEM_BAD_STATE  - KALERT_NOTIFY_BASE] = "bad mem state",
-	[KALERT_MEM_LEAK       - KALERT_NOTIFY_BASE] = "mem leak",
-	[KALERT_FS_EXT4_ERR    - KALERT_NOTIFY_BASE] = "ext4 err",
+	[KALERT_GEN_SOFTLOCKUP - KALERT_EVENT_BASE] = "softlockup",
+	[KALERT_GEN_RCUSTALL   - KALERT_EVENT_BASE] = "rcu stall",
+	[KALERT_GEN_HUNGTASK   - KALERT_EVENT_BASE] = "hung task",
+	[KALERT_MEM_ALLOCFAIL  - KALERT_EVENT_BASE] = "mem alloc fail",
+	[KALERT_MEM_OOM        - KALERT_EVENT_BASE] = "oom",
+	[KALERT_MEM_BAD_STATE  - KALERT_EVENT_BASE] = "bad mem state",
+	[KALERT_MEM_LEAK       - KALERT_EVENT_BASE] = "mem leak",
+	[KALERT_FS_EXT4_ERR    - KALERT_EVENT_BASE] = "ext4 err",
 };
 // clang-format on
 
 static inline const char *kalert_event_name(int eventid)
 {
-	int idx = eventid - KALERT_NOTIFY_BASE;
+	int idx = eventid - KALERT_EVENT_BASE;
 	if (idx < 0 || (size_t)idx >= KALERT_ARRAY_SIZE(kalert_event_str))
 		return "unknown";
 	return kalert_event_str[idx] ?: "unknown";

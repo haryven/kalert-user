@@ -32,7 +32,7 @@ static inline int events_to_bitmap(const int *event_ids, size_t count,
 		bitmap[i] = 0;
 
 	for (size_t i = 0; i < count; i++) {
-		int index = event_ids[i] - KALERT_NOTIFY_BASE;
+		int index = event_ids[i] - KALERT_EVENT_BASE;
 		if (index < 0 || (size_t)index >= nbits)
 			return -EINVAL;
 
