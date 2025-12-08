@@ -15,6 +15,7 @@
 #include <string.h>
 #include <sys/poll.h>
 #include <syslog.h>
+#include <stdbool.h>
 
 #define kalert_msg(priority, format, ...) \
 	syslog(priority, format, ##__VA_ARGS__)
@@ -45,6 +46,10 @@
 #define KALERT_MAX_MSG_SIZE 8192 // MNL_SOCKET_BUFFER_SIZE
 #define KALERT_MASK(type) (1U << (type))
 
+#ifndef U16_MAX
+#define U16_MAX 65535
+#endif
+
 struct kalert_message {
 	struct nlmsghdr nlh;
 	char data[KALERT_MAX_MSG_SIZE];
@@ -63,7 +68,7 @@ static const char* const kalert_chnl_attr_to_str[] = {
 	[KALERT_GET_STAT_MASK] = "get_stat_mask"
 };
 
-static const char* const kalert_type_to_str[] = {
+static const char* const kalert_type_str[] = {
 	[KALERT_NOTIFY_ALL] = "unknow",
 	[KALERT_NOTIFY_GEN] = "generic",
 	[KALERT_NOTIFY_MEM] = "mem",
@@ -76,7 +81,7 @@ static const char* const kalert_type_to_str[] = {
 	[KALERT_NOTIFY_SEC] = "security"
 };
 
-static const char* const kalert_level_to_str[] = {
+static const char* const kalert_level_str[] = {
 	[KALERT_LEVEL_ALL] = "unknow",
 	[KALERT_INFO] = "info",
 	[KALERT_WARN] = "warn",
@@ -95,6 +100,20 @@ static const char * const kalert_event_str[] = {
 	[KALERT_FS_EXT4_ERR    - KALERT_EVENT_BASE] = "ext4 err",
 };
 // clang-format on
+
+static inline bool kalert_notify_valid(struct kalert_notify_msg *notify)
+{
+	if (notify->type >= KALERT_NOTIFY_MAX)
+		return false;
+	if (notify->level >= KALERT_LEVEL_MAX)
+		return false;
+	if (notify->event == KALERT_EVENT_HEARTBEAT)
+		return true;
+	if (notify->event < KALERT_EVENT_BASE ||
+	    notify->event >= KALERT_EVENT_END)
+		return false;
+	return true;
+}
 
 static inline const char *kalert_event_name(int eventid)
 {

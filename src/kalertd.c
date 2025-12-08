@@ -53,19 +53,29 @@ bool load_kalertd_config(void)
 void parse_notify_message(struct kalert_message *reply)
 {
 	struct kalert_notify_msg *notify;
+	const char *type_str, *level_str, *event_str;
 
 	notify = NLMSG_DATA(&reply->nlh);
+	if (!kalert_notify_valid(notify))
+		return;
+
+	type_str = kalert_type_str[notify->type];
+	level_str = kalert_level_str[notify->level];
+	event_str = kalert_event_name(notify->event);
 
 	switch (notify->type) {
 	case KALERT_NOTIFY_MEM:
 	case KALERT_NOTIFY_GEN:
 	case KALERT_NOTIFY_FS: {
-		printf("Received message %d,type = %d,level = %d, event=%d\n",
-		       msg_count++, notify->type, notify->level, notify->event);
+		kalert_event(
+			"{\"ts\":%llu,\"type\":%s,\"event\":%s,\"level\":%s}\n",
+			msg_count++, type_str, event_str, level_str);
 		break;
 	}
 	default:
-		printf("Received message unknow\n");
+		kalert_event(
+			"{\"ts\":%llu,\"type\":\"unknow\",\"event\":%s,\"level\":%s\n",
+			msg_count++, event_str, level_str);
 	}
 }
 

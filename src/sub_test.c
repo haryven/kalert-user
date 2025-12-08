@@ -8,6 +8,8 @@ void parse_notify_message(struct kalert_message *reply)
 	struct kalert_notify_msg *notify;
 
 	notify = NLMSG_DATA(&reply->nlh);
+	if (kalert_notify_valid(notify))
+		return;
 
 	switch (notify->type) {
 	case KALERT_NOTIFY_GEN:
@@ -20,8 +22,8 @@ void parse_notify_message(struct kalert_message *reply)
 	case KALERT_NOTIFY_VIRT:
 	case KALERT_NOTIFY_SEC: {
 		printf("Received message %d,type = %s,level = %s, event=%s\n",
-		       msg_count++, kalert_type_to_str[notify->type],
-		       kalert_level_to_str[notify->level],
+		       msg_count++, kalert_type_str[notify->type],
+		       kalert_level_str[notify->level],
 		       kalert_event_name(notify->event));
 		break;
 	}
