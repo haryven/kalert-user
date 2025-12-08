@@ -90,13 +90,18 @@ static const char* const kalert_level_str[] = {
 };
 
 static const char * const kalert_event_str[] = {
+	/* GEN events */
 	[KALERT_GEN_SOFTLOCKUP - KALERT_EVENT_BASE] = "softlockup",
 	[KALERT_GEN_RCUSTALL   - KALERT_EVENT_BASE] = "rcu stall",
 	[KALERT_GEN_HUNGTASK   - KALERT_EVENT_BASE] = "hung task",
+	/* MEM events */
 	[KALERT_MEM_ALLOCFAIL  - KALERT_EVENT_BASE] = "mem alloc fail",
 	[KALERT_MEM_OOM        - KALERT_EVENT_BASE] = "oom",
 	[KALERT_MEM_BAD_STATE  - KALERT_EVENT_BASE] = "bad mem state",
 	[KALERT_MEM_LEAK       - KALERT_EVENT_BASE] = "mem leak",
+	/* IO events */
+	[KALERT_IO_GLITCH      - KALERT_EVENT_BASE] = "io latency spike",
+	/* FS events */
 	[KALERT_FS_EXT4_ERR    - KALERT_EVENT_BASE] = "ext4 err",
 };
 // clang-format on
