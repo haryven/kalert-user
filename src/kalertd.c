@@ -21,8 +21,11 @@ static struct ev_io netlink_watcher;
 static struct ev_signal sigterm_watcher;
 static struct ev_signal sighup_watcher;
 
-/* Global variables */
+/* Use UTC or local time for event log  */
 bool g_flag_utc = false;
+
+/* kalertd event filter level */
+int g_event_level;
 
 #define KALERT_EVENT_LOG_FILE "/var/log/kalert_event.log"
 #define KALERTD_CONF_FILE "/etc/kalert/kalertd.conf"
@@ -33,6 +36,24 @@ bool parse_main_conf_line(const char *key, const char *val)
 		g_flag_utc = (strcasecmp(val, "on") == 0);
 		return true;
 	}
+
+	if (strcmp(key, "KALERT_EVENT_LEVEL") == 0) {
+		/* val may be string or number */
+		if (strcasecmp(val, "ALL") == 0)
+			g_event_level = 0;
+		else if (strcasecmp(val, "INFO") == 0)
+			g_event_level = 1;
+		else if (strcasecmp(val, "WARN") == 0)
+			g_event_level = 2;
+		else if (strcasecmp(val, "ERROR") == 0)
+			g_event_level = 3;
+		else if (strcasecmp(val, "FATAL") == 0)
+			g_event_level = 4;
+		else
+			g_event_level = atoi(val); /* numeric fallback */
+		return true;
+	}
+
 	return false;
 }
 
@@ -47,6 +68,7 @@ bool load_kalertd_config(void)
 
 	kalert_event_set_utc(g_flag_utc);
 
+	kalert_set_filter_level(sock_fd, g_event_level);
 	return true;
 }
 
