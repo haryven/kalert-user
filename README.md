@@ -14,7 +14,9 @@ sudo make install
 - **Using rpmbuild**
 
 ```bash
-rpmbuild -ba packaging/kalert-user.spec
+# generate tar.gz
+make dist
+rpmbuild -ta kalert-user-1.0.0.tar.gz
 # The resulting RPM can be found under the RPMS directory.
 ```
 ## 2.kalertd - Kernel Fault Event Alert Daemon
