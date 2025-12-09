@@ -66,7 +66,13 @@ void parse_notify_message(struct kalert_message *reply)
 	switch (notify->type) {
 	case KALERT_NOTIFY_MEM:
 	case KALERT_NOTIFY_GEN:
-	case KALERT_NOTIFY_FS: {
+	case KALERT_NOTIFY_IO:
+	case KALERT_NOTIFY_FS:
+	case KALERT_NOTIFY_SCHED:
+	case KALERT_NOTIFY_NET:
+	case KALERT_NOTIFY_RAS:
+	case KALERT_NOTIFY_VIRT:
+	case KALERT_NOTIFY_SEC: {
 		kalert_event(
 			"{\"ts\":%llu,\"type\":%s,\"event\":%s,\"level\":%s}\n",
 			msg_count++, type_str, event_str, level_str);
