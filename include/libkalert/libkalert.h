@@ -139,6 +139,9 @@ int kalert_get_reply(int fd, struct kalert_message *rep, reply_t block,
 
 /* Advance wrap interface */
 int kalert_start_channel(void);
+int kalert_set_filter_level(int fd, uint32_t filter_level);
+int kalert_set_enable(int fd, uint32_t enable);
+int kalert_set_portid(int fd, uint32_t portid);
 int __kalert_subscribe_event(int fd, const int *event_ids, size_t count,
 			     uint32_t level);
 int kalert_subscribe_type(int fd, uint64_t type_mask, uint32_t level);
