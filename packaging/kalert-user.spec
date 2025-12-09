@@ -39,6 +39,10 @@ sed -e "s|@prefix@|%{_prefix}|" \
 mkdir -p %{buildroot}%{_unitdir}
 install -m 0644 packaging/kalertd.service %{buildroot}%{_unitdir}/kalertd.service
 
+# install configuration files
+mkdir -p %{buildroot}%{_sysconfdir}/kalert
+cp -a packaging/conf/* %{buildroot}%{_sysconfdir}/kalert/
+
 %post
 /sbin/ldconfig
 %systemd_post kalertd.service
@@ -61,6 +65,7 @@ install -m 0644 packaging/kalertd.service %{buildroot}%{_unitdir}/kalertd.servic
 %{_includedir}/libkalert/
 %{_libdir}/pkgconfig/libkalert.pc
 %{_unitdir}/kalertd.service
+%config(noreplace) %{_sysconfdir}/kalert/*
 
 %changelog
 * Mon Aug 18 2025 Huiwen He <hehuiwen@kylinos.cn> - 1.0.0-1
