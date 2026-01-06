@@ -12,6 +12,7 @@ BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  pkgconfig
 BuildRequires:  libmnl-devel
+BuildRequires:  libev-devel
 
 Provides:       libkalert.so
 
