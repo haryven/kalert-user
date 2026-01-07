@@ -6,8 +6,8 @@ LIB_BUILD   := $(BUILD_DIR)/libkalert
 APP_BUILD   := $(BUILD_DIR)/app
 
 DESTDIR         ?=
-PREFIX          ?= /usr/local
-libdir          ?= $(PREFIX)/lib
+PREFIX		?= /usr
+libdir		?= $(PREFIX)/$(shell [ -d /usr/lib64 ] && echo lib64 || echo lib)
 bindir          ?= $(PREFIX)/bin
 includedir      ?= $(PREFIX)/include
 
@@ -45,8 +45,10 @@ install: all
 	$(INSTALL_DIR) $(DESTDIR)$(includedir)/$(LIB_NAME)
 
 	# Install libraries
-	$(INSTALL_FILE) $(LIB_BUILD)/*.so* $(DESTDIR)$(libdir) 2>/dev/null || true
+	$(INSTALL_BIN) $(LIB_BUILD)/$(LIB_NAME).so.$(VERSION) $(DESTDIR)$(libdir)
 	$(INSTALL_FILE) $(LIB_BUILD)/*.a   $(DESTDIR)$(libdir) 2>/dev/null || true
+	ln -sf $(LIB_NAME).so.$(VERSION) $(DESTDIR)$(libdir)/$(LIB_NAME).so.1
+	ln -sf $(LIB_NAME).so.1         $(DESTDIR)$(libdir)/$(LIB_NAME).so
 
 	# Install headers
 	$(INSTALL_FILE) $(SRC_ROOT)/include/$(LIB_NAME)/* $(DESTDIR)$(includedir)/$(LIB_NAME)
