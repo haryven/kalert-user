@@ -104,7 +104,7 @@ void parse_notify_message(struct kalert_message *reply)
 		break;
 	default:
 		kalert_event(
-			"{\"ts\":%llu,\"type\":\"unknow\",\"event\":%s,\"level\":%s\n",
+			"{\"ts\":%llu,\"type\":\"unknow\",\"event\":%s,\"level\":%s}\n",
 			msg_count++, event_str, level_str);
 	}
 }
