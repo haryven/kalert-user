@@ -90,11 +90,6 @@ int kalert_set_portid(int fd, uint32_t portid)
 {
 	uint64_t attr[KALERT_ATTR_MAX];
 
-	if (portid <= 0) {
-		kalert_msg(LOG_WARNING, "Try to set an invalid portid: %d",
-			   portid);
-		return -EINVAL;
-	}
 	attr[KALERT_PORTID] = portid;
 	return kalert_set_parameter(fd, KALERT_MASK(KALERT_PORTID), attr);
 }
