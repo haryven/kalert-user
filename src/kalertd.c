@@ -130,6 +130,7 @@ static void hup_handler(struct ev_loop *loop, struct ev_signal *w, int revents)
 static void term_handler(struct ev_loop *loop, struct ev_signal *w, int revents)
 {
 	kalert_msg(LOG_INFO, "Received termination signal, shutting down...");
+	kalert_set_portid(sock_fd, 0);
 	ev_io_stop(loop, &netlink_watcher);
 	ev_signal_stop(loop, &sigterm_watcher);
 	ev_signal_stop(loop, &sighup_watcher);
