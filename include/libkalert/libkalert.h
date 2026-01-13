@@ -50,6 +50,10 @@
 #define U16_MAX 65535
 #endif
 
+#ifndef KALERT_EVENT_HEARTBEAT
+#define KALERT_EVENT_HEARTBEAT U16_MAX
+#endif
+
 struct kalert_message {
 	struct nlmsghdr nlh;
 	char data[KALERT_MAX_MSG_SIZE];
