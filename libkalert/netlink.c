@@ -235,9 +235,6 @@ int kalert_send_request(int fd, struct kalert_message *req)
 	if (fd < 0 || !req)
 		return -EINVAL;
 
-	if (fd < 0 || !req)
-		return -EINVAL;
-
 	rc = kalert_send(fd, req, &seq);
 	if (rc == (int)req->nlh.nlmsg_len) {
 		return check_ack(fd, seq);
